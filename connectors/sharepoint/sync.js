@@ -94,6 +94,62 @@ class SharePointSync {
   }
 
   /**
+   * Descargar un archivo usando un enlace para compartir (sharing link)
+   * Soporta URLs como:
+   *   https://<tenant>-my.sharepoint.com/:x:/g/personal/<user>/....
+   */
+  async downloadBySharingLink(sharingUrl) {
+    if (!this.accessToken) await this.authenticate();
+
+    try {
+      console.log(`\n🔗 Descarga por enlace compartido...`);
+      // Codificar la URL en base64URL y anteponer 'u!'
+      const b64 = Buffer.from(sharingUrl).toString('base64')
+        .replace(/=/g, '')
+        .replace(/\+/g, '-')
+        .replace(/\//g, '_');
+      const shareId = `u!${b64}`;
+
+      // Obtener metadatos del elemento
+      const metaUrl = `https://graph.microsoft.com/v1.0/shares/${shareId}/driveItem`;
+      const metaRes = await axios.get(metaUrl, {
+        headers: { Authorization: `Bearer ${this.accessToken}` }
+      });
+
+      const fileName = metaRes.data?.name || 'archivo_descargado';
+      console.log(`📄 Archivo: ${fileName}`);
+
+      // Descargar contenido
+      const contentUrl = `https://graph.microsoft.com/v1.0/shares/${shareId}/driveItem/content`;
+      const contentRes = await axios.get(contentUrl, {
+        headers: { Authorization: `Bearer ${this.accessToken}` },
+        responseType: 'arraybuffer'
+      });
+
+      // Guardar en carpeta data
+      const dataDir = path.join(__dirname, '../../data');
+      if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir, { recursive: true });
+      const outputPath = path.join(dataDir, fileName);
+      fs.writeFileSync(outputPath, contentRes.data);
+      console.log(`✅ Descargado en: ${outputPath}`);
+      return outputPath;
+    } catch (error) {
+      const message = error.response?.data?.error?.message || error.message;
+      console.error('❌ Error descargando por enlace:', message);
+      if (error.response?.data) {
+        try {
+          console.error('📦 Detalle Graph:', JSON.stringify(error.response.data, null, 2));
+        } catch {}
+      }
+      if (message?.includes('Access denied') || error.response?.status === 403) {
+        console.log('\n💡 Falta consentimiento de permisos para la aplicación.');
+        console.log('   Requeridos: Files.Read.All y/o Sites.Read.All (permisos de aplicación).');
+      }
+      return null;
+    }
+  }
+
+  /**
    * Listar archivos en SharePoint
    */
   async listFiles(folderPath = '') {
@@ -228,8 +284,13 @@ async function main() {
     // Si hay argumentos, descargar archivo específico
     const args = process.argv.slice(2);
     if (args.length > 0) {
-      const fileName = args[0];
-      await sync.downloadFile(fileName);
+      const target = args[0];
+      if (/^https?:\/\//i.test(target)) {
+        // Es un enlace completo de SharePoint
+        await sync.downloadBySharingLink(target);
+      } else {
+        await sync.downloadFile(target);
+      }
     }
 
     console.log('========================================');
