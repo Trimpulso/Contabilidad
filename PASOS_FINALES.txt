@@ -1,0 +1,172 @@
+📋 PRÓXIMOS PASOS - COMPLETAR CONFIGURACIÓN SHAREPOINT
+======================================================
+
+✅ QUÉ SE COMPLETÓ:
+─────────────────────────────────────────────────────
+
+1. ✅ Git inicializado localmente
+2. ✅ Repositorio conectado a GitHub: https://github.com/Trimpulso/contabilidad/
+3. ✅ security_analysis.md creado con información de Trimpulso
+4. ✅ config.json protegido en .gitignore
+5. ✅ Scripts de validación y sincronización listos
+6. ✅ Primer commit realizado
+
+📊 INFORMACIÓN DE TRIMPULSO REGISTRADA:
+─────────────────────────────────────────────────────
+
+Organización: Trimpulso
+Dominio: trimpulso.cl
+Tenant ID: 9c33f678-1021-46f8-8573-516a0de0929c
+SharePoint: https://trimpulso-my.sharepoint.com/
+Usuario Admin: job.llanos@trimpulso.cl
+ID del Objeto: 13486155-477e-474b-9520-712c2b16864a
+GitHub: https://github.com/Trimpulso/contabilidad/
+
+🎯 PRÓXIMOS PASOS PARA CONECTAR:
+─────────────────────────────────────────────────────
+
+PASO 1: REGISTRAR APLICACIÓN EN AZURE PORTAL
+─────────────────────────────────────────────
+
+1. Ve a: https://portal.azure.com
+2. Inicia sesión con: job.llanos@trimpulso.cl
+3. Busca: "Azure Active Directory"
+4. Ve a: "Registros de aplicaciones"
+5. Haz clic: "+ Nuevo registro"
+
+Completa los datos:
+• Nombre: "SharePoint-Contabilidad-Trimpulso"
+• Tipos de cuenta: "Solo mi organización"
+• URI de redirección: (dejar en blanco)
+
+6. Haz clic: "Registrar"
+
+PASO 2: COPIAR CLIENT ID
+────────────────────────
+
+1. En la app registrada, ve a "Información general"
+2. Copia el valor: "ID de aplicación (cliente)"
+   Esto es tu CLIENT_ID
+
+PASO 3: CREAR CLIENT SECRET
+────────────────────────────
+
+1. En la app, ve a: "Certificados y secretos"
+2. Haz clic: "+ Nuevo secreto de cliente"
+
+Completa:
+• Descripción: "SharePoint Sync - Contabilidad"
+• Expira en: "24 meses"
+
+3. Haz clic: "Agregar"
+4. Copia el "Valor" (solo aparece una vez)
+   Esto es tu CLIENT_SECRET
+
+PASO 4: AGREGAR PERMISOS
+────────────────────────
+
+1. En la app, ve a: "Permisos de API"
+2. Haz clic: "+ Agregar permiso"
+3. Selecciona: "Microsoft Graph"
+4. Selecciona: "Permisos delegados" O "Permisos de aplicación"
+
+Busca y agrega estos permisos:
+✓ Files.Read.All
+✓ Files.ReadWrite.All
+✓ Sites.Read.All
+✓ Sites.ReadWrite.All
+
+5. Haz clic: "Agregar permisos"
+
+Si pide consentimiento del administrador, haz clic en:
+"Conceder consentimiento del administrador para Trimpulso"
+
+PASO 5: CREAR ARCHIVO DE CONFIGURACIÓN LOCAL
+──────────────────────────────────────────────
+
+Crea el archivo: connectors/sharepoint/config.json
+
+Contenido:
+{
+  "tenantId": "9c33f678-1021-46f8-8573-516a0de0929c",
+  "clientId": "PEGA_AQUI_TU_CLIENT_ID",
+  "clientSecret": "PEGA_AQUI_TU_CLIENT_SECRET",
+  "siteUrl": "https://trimpulso-my.sharepoint.com/"
+}
+
+⚠️ IMPORTANTE:
+   • Este archivo NO se commitea a GitHub
+   • Está protegido en .gitignore
+   • Solo existe en tu máquina local
+
+PASO 6: VALIDAR CONFIGURACIÓN
+──────────────────────────────
+
+Ejecuta:
+cd connectors/sharepoint
+npm run validate
+
+Debería mostrar:
+✅ CONFIGURACIÓN VÁLIDA
+  • Tenant ID: 9c33f678-1021-46f8-8573-516a0de0929c
+  • Client ID: [tus valores]...
+  • Site URL: https://trimpulso-my.sharepoint.com/
+
+PASO 7: CONECTAR CON SHAREPOINT
+────────────────────────────────
+
+Ejecuta:
+npm run sync
+
+Esto:
+✅ Se conecta a Azure AD
+✅ Lista archivos en SharePoint
+✅ Descarga especificaciones
+
+PASO 8: DESCARGAR UN ARCHIVO (Opcional)
+────────────────────────────────────────
+
+Para descargar un archivo específico:
+npm run sync "NombreDelArchivo.docx"
+
+Los archivos se guardan en: /data/
+
+PASO 9: COMMITEAR A GITHUB (Solo cambios, no config)
+──────────────────────────────────────────────────────
+
+El config.json NO se commitea (está en .gitignore)
+
+Solo commitea cambios en:
+• connectors/sharepoint/sync.js
+• connectors/sharepoint/validate.js
+• docs/
+• README.md
+
+Ejemplo:
+cd ../../
+git add .
+git commit -m "Mejora: Agregar validación de configuración"
+git push origin main
+
+📚 DOCUMENTACIÓN:
+──────────────────
+
+Para más información:
+• docs/security_analysis.md - Información de seguridad
+• docs/SHAREPOINT_CREDENTIALS.md - Guía detallada
+• README.md - Documentación general
+• INICIO.txt - Esta guía
+
+📞 SOPORTE:
+────────────
+
+Email: job.llanos@trimpulso.cl
+GitHub: https://github.com/Trimpulso/contabilidad/
+
+═════════════════════════════════════════════════════════
+
+¿Necesitas ayuda en algún paso? Revisa la documentación
+en la carpeta docs/
+
+Cuando completres estos pasos, habrás conectado
+exitosamente SharePoint con Trimpulso Contabilidad. 🎉
