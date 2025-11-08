@@ -166,7 +166,15 @@ class ChatbotCAI {
    * Detectar intención del usuario
    */
   detectIntent(text) {
-    const lower = text.toLowerCase();
+    const lower = text.toLowerCase().trim();
+
+    // SHORTCUTS POR NÚMERO
+    if (lower === '1' || lower === 'uno') return 'riesgo_critico';
+    if (lower === '2' || lower === 'dos') return 'deuda_total';
+    if (lower === '3' || lower === 'tres') return 'excepciones';
+    if (lower === '4' || lower === 'cuatro') return 'aprobados';
+    if (lower === '5' || lower === 'cinco') return 'listar_proveedores';
+    if (lower === '6' || lower === 'seis') return 'proveedor_info';
 
     // Intent 1: Riesgo Crítico
     if (
@@ -193,6 +201,7 @@ class ChatbotCAI {
     // Intent 3: Excepciones
     if (
       lower.includes('excepción') ||
+      lower.includes('excepcion') ||
       lower.includes('aprobada') ||
       lower.includes('supervisada') ||
       lower.includes('cuántas excepciones')
@@ -225,7 +234,8 @@ class ChatbotCAI {
       lower.includes('proveedor') ||
       lower.includes('rut') ||
       lower.includes('empresa') ||
-      lower.includes('información')
+      lower.includes('información') ||
+      lower.includes('informacion')
     ) {
       return 'proveedor_info';
     }
