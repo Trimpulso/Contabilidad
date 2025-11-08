@@ -1,6 +1,8 @@
 /**
  * CAI - Chatbot de Asistencia Contable Inteligente
  * MVP v2 - Respuestas fijas + Intent Listar Proveedores + Help mejorado
+ * v2.1 - Fix: Shortcuts numéricos (1-6) funcionando
+ * Updated: 8/11/2025 14:30
  */
 
 class ChatbotCAI {
