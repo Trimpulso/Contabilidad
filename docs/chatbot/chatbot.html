@@ -1,0 +1,44 @@
+<!-- Contenedor del Chatbot Flotante -->
+<div class="chatbot-container">
+  <!-- Botón Flotante -->
+  <button class="chatbot-button" id="chatbotToggle" title="Abrir Chat">
+    💬
+  </button>
+
+  <!-- Ventana del Chat -->
+  <div class="chatbot-window" id="chatbotWindow">
+    <!-- Header -->
+    <div class="chatbot-header">
+      <h3>
+        🤖 CAI - Asistente Contable
+      </h3>
+      <div class="chatbot-header-buttons">
+        <button class="chatbot-header-btn" id="chatbotMinimize" title="Minimizar">
+          _
+        </button>
+        <button class="chatbot-header-btn" id="chatbotClose" title="Cerrar">
+          ✕
+        </button>
+      </div>
+    </div>
+
+    <!-- Área de Mensajes -->
+    <div class="chatbot-messages" id="chatbotMessages">
+      <!-- Los mensajes se inyectan aquí -->
+    </div>
+
+    <!-- Área de Entrada -->
+    <div class="chatbot-input-area">
+      <input
+        type="text"
+        class="chatbot-input"
+        id="chatbotInput"
+        placeholder="Escribe tu pregunta..."
+        autocomplete="off"
+      />
+      <button class="chatbot-send-btn" id="chatbotSend" title="Enviar">
+        📤
+      </button>
+    </div>
+  </div>
+</div>
