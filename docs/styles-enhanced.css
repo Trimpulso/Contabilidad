@@ -36,10 +36,15 @@ button.small:hover{background:rgba(255,255,255,0.3)}
 
 .grid.full{grid-template-columns:1fr}
 .panel{background:white;border:1px solid #e5e7eb;border-radius:8px;padding:16px;box-shadow:0 1px 3px rgba(0,0,0,.05);overflow:hidden}
-.panel-lg{grid-column:span 1}
+.panel-lg{grid-column:span 1;max-height:450px;display:flex;flex-direction:column}
 .panel-sm{grid-column:span 1}
 .panel-full{grid-column:1/-1}
 .panel h3{margin:0 0 12px;font-size:16px;color:#111827}
+
+/* Canvas chart height */
+#chartPanel canvas{max-height:380px!important}
+#chartPanel{display:flex;flex-direction:column}
+#chart{flex:1;max-height:350px}
 
 /* Pivot Controls */
 .pivot-controls{display:flex;gap:1rem;margin-bottom:1rem;flex-wrap:wrap}
@@ -48,7 +53,19 @@ button.small:hover{background:rgba(255,255,255,0.3)}
 .pivot-controls button{padding:0.5rem 1rem;background:#64748b;color:white;border:none;border-radius:6px;cursor:pointer}
 .pivot-controls button:hover{background:#475569}
 
-#pivotTable{overflow:auto;max-height:500px}
+/* Pivot Panel Improvements */
+.pivot-panel{position:relative}
+.panel-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;padding-bottom:0.5rem;border-bottom:2px solid #e5e7eb}
+.panel-header h3{margin:0;flex:1}
+.toggle-btn{padding:0.25rem 0.75rem;background:#e5e7eb;color:#374151;border:1px solid #d1d5db;border-radius:4px;font-size:0.85rem;cursor:pointer;min-width:40px}
+.toggle-btn:hover{background:#d1d5db}
+
+.pivot-content{max-height:600px;overflow-y:auto;transition:all 0.3s ease}
+.pivot-content.collapsed{max-height:0;overflow:hidden}
+
+.pivot-table-wrapper{overflow-x:auto;border-top:1px solid #e5e7eb;padding-top:1rem}
+
+#pivotTable{overflow:auto;max-height:400px}
 #pivotTable table{border-collapse:collapse;width:100%;font-size:0.9rem}
 #pivotTable th{background:#0284c7;color:white;padding:0.75rem;text-align:left;position:sticky;top:0;z-index:10}
 #pivotTable td{padding:0.5rem 0.75rem;border:1px solid #e2e8f0}

@@ -52,6 +52,7 @@ function setupEventListeners() {
   document.getElementById('btnRefresh').addEventListener('click', refreshData);
   document.getElementById('btnPivot').addEventListener('click', togglePivot);
   document.getElementById('btnClosePivot').addEventListener('click', closePivot);
+  document.getElementById('btnTogglePivot').addEventListener('click', togglePivotCollapse);
 
   // Pivot
   document.getElementById('pivotRows').addEventListener('change', renderPivotTable);
@@ -511,6 +512,23 @@ function togglePivot() {
 // Cerrar pivot
 function closePivot() {
   document.getElementById('pivotSection').classList.add('hidden');
+}
+
+// Toggle collapse/expand de tabla pivote
+function togglePivotCollapse() {
+  const content = document.getElementById('pivotContent');
+  const btn = document.getElementById('btnTogglePivot');
+  
+  content.classList.toggle('collapsed');
+  
+  // Cambiar icono
+  if (content.classList.contains('collapsed')) {
+    btn.textContent = '▶';
+    btn.title = 'Expandir tabla pivote';
+  } else {
+    btn.textContent = '▼';
+    btn.title = 'Contraer tabla pivote';
+  }
 }
 
 // Renderizar tabla pivote

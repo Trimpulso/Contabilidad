@@ -102,17 +102,22 @@
     </div>
   </section>
 
-  <!-- Tabla Pivote (oculta por defecto) -->
+  <!-- Tabla Pivote (oculta por defecto, collapsible) -->
   <section id="pivotSection" class="grid hidden">
-    <div class="panel panel-full">
-      <h3>📊 Tabla Pivote</h3>
-      <div class="pivot-controls">
-        <label>Filas: <select id="pivotRows"></select></label>
-        <label>Columnas: <select id="pivotCols"></select></label>
-        <label>Valores: <select id="pivotVals"></select></label>
-        <button id="btnClosePivot">Cerrar</button>
+    <div class="panel panel-full pivot-panel">
+      <div class="panel-header">
+        <h3>📊 Tabla Pivote</h3>
+        <button id="btnTogglePivot" class="toggle-btn" title="Expandir/Contraer">▼</button>
       </div>
-      <div id="pivotTable"></div>
+      <div id="pivotContent" class="pivot-content">
+        <div class="pivot-controls">
+          <label>Filas: <select id="pivotRows"></select></label>
+          <label>Columnas: <select id="pivotCols"></select></label>
+          <label>Valores: <select id="pivotVals"></select></label>
+          <button id="btnClosePivot">✕ Cerrar</button>
+        </div>
+        <div id="pivotTable" class="pivot-table-wrapper"></div>
+      </div>
     </div>
   </section>
 
