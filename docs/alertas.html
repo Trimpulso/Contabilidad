@@ -240,13 +240,12 @@
 
     // Inicialización
     document.addEventListener('DOMContentLoaded', () => {
-      if (appState.token) {
-        fetchUserProfile();
-      } else {
-        showLoginModal();
-      }
-
+      // Generar token temporal para acceso sin autenticación
+      appState.token = 'guest-token-' + Date.now();
+      
+      updateUserUI();
       setupEventListeners();
+      loadAlerts();
     });
 
     function setupEventListeners() {
@@ -273,7 +272,8 @@
         location.reload();
       }
     }    function showLoginModal() {
-      document.getElementById('loginModal').classList.remove('hidden');
+      // Modal de login deshabilitado - acceso sin credenciales
+      console.log('ℹ️ Dashboard accesible sin autenticación');
     }
 
     async function handleLogin(e) {
@@ -335,10 +335,9 @@
       const userInfo = document.getElementById('userInfo');
       const btnLogout = document.getElementById('btnLogout');
       
-      if (appState.user) {
-        userInfo.textContent = `👤 ${appState.user.name}`;
-        btnLogout.classList.remove('hidden');
-      }
+      // Mostrar acceso de invitado
+      userInfo.textContent = '👤 Acceso de Invitado';
+      btnLogout.classList.add('hidden');
     }
 
     async function loadAlerts() {

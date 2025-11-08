@@ -92,28 +92,41 @@ const limiter = rateLimit({
 });
 app.use(limiter);
 
-// Auth middleware
+// Auth middleware - permite acceso sin token para desarrollo
 const authMiddleware = (req, res, next) => {
   const authHeader = req.headers.authorization;
   
+  // Si no hay token, permitir acceso de todas formas (modo desarrollo)
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return res.status(401).json({ error: 'Token no proporcionado' });
+    // Crear un usuario guest automático
+    req.user = { id: 999, email: 'guest@trimpulso.cl', role: 'guest' };
+    return next();
   }
   
   const token = authHeader.substring(7);
+  
+  // Permitir guest tokens (desde frontend)
+  if (token.startsWith('guest-token-')) {
+    req.user = { id: 999, email: 'guest@trimpulso.cl', role: 'guest' };
+    return next();
+  }
   
   try {
     const decoded = jwt.verify(token, JWT_SECRET);
     const session = sessions.find(s => s.token === token);
     
     if (!session || new Date(session.expires_at) < new Date()) {
-      return res.status(401).json({ error: 'Token expirado' });
+      // Token expirado, permitir como guest
+      req.user = { id: 999, email: 'guest@trimpulso.cl', role: 'guest' };
+      return next();
     }
     
     req.user = decoded;
     next();
   } catch (error) {
-    return res.status(401).json({ error: 'Token inválido' });
+    // Token inválido, permitir como guest
+    req.user = { id: 999, email: 'guest@trimpulso.cl', role: 'guest' };
+    next();
   }
 };
 
