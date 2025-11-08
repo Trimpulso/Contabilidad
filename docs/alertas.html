@@ -347,24 +347,146 @@
 
     async function loadAlerts() {
       try {
-        // Obtener estadísticas
-        const statsResponse = await fetch(`${appState.apiBaseUrl}/security/stats`, {
-          headers: { 'Authorization': `Bearer ${appState.token}` }
-        });
-        const stats = await statsResponse.json();
-        renderStats(stats);
+        // Cargar datos desde JSON local
+        const response = await fetch('./data/contabilidad.json');
+        const dataFile = await response.json();
+        const registros = dataFile.hojas.Hoja1 || [];
 
-        // Obtener registros con alertas
-        const alertsResponse = await fetch(`${appState.apiBaseUrl}/records/with-alerts`, {
-          headers: { 'Authorization': `Bearer ${appState.token}` }
-        });
-        const alertsData = await alertsResponse.json();
-        renderAlerts(alertsData.records);
+        // Aplicar análisis de seguridad localmente
+        const registrosConAnalisis = registros.map((reg, idx) => ({
+          id: idx + 1,
+          ...reg,
+          analisisSeguridad: analizarDTELocal(reg, registros)
+        }));
+
+        // Filtrar registros con alertas
+        const registrosConAlertas = registrosConAnalisis.filter(r => 
+          r.analisisSeguridad.alertas.length > 0
+        );
+
+        // Calcular estadísticas
+        const stats = {
+          total: registros.length,
+          bloqueados: registrosConAlertas.filter(r => r.analisisSeguridad.nivel === 'CRÍTICO').length,
+          requierenAprobacion: registrosConAlertas.filter(r => r.analisisSeguridad.nivel === 'MEDIO').length,
+          proveedoresConocidos: new Set(registros.map(r => r.RUT_Emisor)).size,
+          scorePromedio: registrosConAnalisis.reduce((sum, r) => sum + r.analisisSeguridad.riesgoScore, 0) / registros.length
+        };
+
+        renderStats(stats);
+        renderAlerts(registrosConAlertas);
       } catch (error) {
         console.error('Error cargando alertas:', error);
         document.getElementById('alertsContainer').innerHTML = 
-          '<p style="color: red;">Error al cargar alertas. Verifica que el servidor esté corriendo.</p>';
+          '<p style="color: red;">Error al cargar datos. ' + error.message + '</p>';
       }
+    }
+
+    function analizarDTELocal(dte, historico) {
+      const alertas = [];
+      let riesgoScore = 0;
+      let nivel = 'BAJO';
+
+      // Proveedores conocidos en el histórico
+      const proveedoresConocidos = new Set(historico.map(r => r.RUT_Emisor));
+      
+      // 1. Verificar si es emisor nuevo
+      if (!proveedoresConocidos.has(dte.RUT_Emisor)) {
+        alertas.push({
+          tipo: 'EMISOR_NUEVO',
+          icono: '🆕',
+          mensaje: `Emisor nuevo: ${dte.Razon_Social_Emisor} no tiene historial`
+        });
+        riesgoScore += 30;
+      }
+
+      // 2. Verificar región
+      const regionesPermitidas = ['Metropolitana', 'Valparaíso', "O'Higgins"];
+      if (!regionesPermitidas.includes(dte.Region_Emisor)) {
+        alertas.push({
+          tipo: 'REGIÓN_SOSPECHOSA',
+          icono: '🌍',
+          mensaje: `Región inusual: ${dte.Region_Emisor}`
+        });
+        riesgoScore += 20;
+      }
+
+      // 3. Verificar monto anormal (>15M)
+      if (dte.Monto_Total > 15000000) {
+        alertas.push({
+          tipo: 'MONTO_ANORMAL',
+          icono: '💰',
+          mensaje: `Monto muy alto: $${dte.Monto_Total.toLocaleString()}`
+        });
+        riesgoScore += 40;
+      }
+
+      // 4. Verificar recepción inmediata (mismo día)
+      const fechaEmision = new Date(dte.Fecha_Emision);
+      const fechaRecepcion = new Date(dte.Fecha_Recepcion);
+      const difDias = Math.floor((fechaRecepcion - fechaEmision) / (1000 * 60 * 60 * 24));
+      if (difDias === 0) {
+        alertas.push({
+          tipo: 'RECEPCIÓN_INMEDIATA',
+          icono: '⚡',
+          mensaje: `Recepción el mismo día de emisión`
+        });
+        riesgoScore += 10;
+      }
+
+      // 5. Verificar folio sospechoso
+      if (dte.Folio_DTE === '9999' || dte.Folio_DTE === '0000') {
+        alertas.push({
+          tipo: 'FOLIO_SOSPECHOSO',
+          icono: '🔢',
+          mensaje: `Folio sospechoso: ${dte.Folio_DTE}`
+        });
+        riesgoScore += 15;
+      }
+
+      // 6. Pendiente + alto monto
+      if (dte.Estado_RCV === 'Pendiente' && dte.Monto_Total > 10000000) {
+        alertas.push({
+          tipo: 'PENDIENTE_ALTO_MONTO',
+          icono: '⚠️',
+          mensaje: `Estado pendiente con monto elevado`
+        });
+        riesgoScore += 25;
+      }
+
+      // 7. IVA incorrecto
+      const ivaEsperado = Math.round(dte.Monto_Neto * 0.19);
+      if (dte.Monto_IVA && Math.abs(dte.Monto_IVA - ivaEsperado) > 1000) {
+        alertas.push({
+          tipo: 'IVA_INCORRECTO',
+          icono: '📊',
+          mensaje: `IVA inconsistente: esperado $${ivaEsperado}, encontrado $${dte.Monto_IVA}`
+        });
+        riesgoScore += 30;
+      }
+
+      // 8. Razón social sospechosa
+      const palabrasSospechosas = ['Fantasma', 'Dudoso', 'Temporal', 'S.A.S.', 'XX'];
+      if (palabrasSospechosas.some(p => dte.Razon_Social_Emisor.includes(p))) {
+        alertas.push({
+          tipo: 'RAZÓN_SOCIAL_SOSPECHOSA',
+          icono: '🚩',
+          mensaje: `Razón social sospechosa: ${dte.Razon_Social_Emisor}`
+        });
+        riesgoScore += 20;
+      }
+
+      // Determinar nivel
+      if (riesgoScore >= 51) nivel = 'CRÍTICO';
+      else if (riesgoScore >= 21) nivel = 'MEDIO';
+      else nivel = 'BAJO';
+
+      return {
+        alertas,
+        riesgoScore,
+        nivel,
+        bloqueado: nivel === 'CRÍTICO'
+      };
     }
 
     function renderStats(stats) {
