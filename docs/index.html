@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Dashboard Contabilidad</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body>
+  <header>
+    <h1>Dashboard Contabilidad</h1>
+    <div class="meta">
+      <span id="fuente"></span>
+      <span id="generado"></span>
+    </div>
+  </header>
+
+  <section class="controls">
+    <label>
+      Hoja:
+      <select id="sheetSelect"></select>
+    </label>
+    <label>
+      Columna categoría:
+      <select id="categorySelect"></select>
+    </label>
+    <label>
+      Columna valor (número):
+      <select id="valueSelect"></select>
+    </label>
+    <label>
+      Filtro rápido:
+      <input id="quickFilter" type="text" placeholder="Buscar..." />
+    </label>
+    <button id="btnExport">Exportar tabla (CSV)</button>
+  </section>
+
+  <section class="grid">
+    <div class="panel">
+      <canvas id="chart" height="140"></canvas>
+    </div>
+    <div class="panel">
+      <div id="tableContainer" class="table"></div>
+    </div>
+  </section>
+
+  <footer>
+    <p>Publicación estática (GitHub Pages) — datos desde <code>docs/data/contabilidad.json</code></p>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>

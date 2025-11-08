@@ -172,6 +172,12 @@ class SharePointSync {
       const jsonPath = path.join(path.dirname(filePath), 'contabilidad.json');
       fs.writeFileSync(jsonPath, JSON.stringify({ fuente: path.basename(filePath), generado: new Date().toISOString(), hojas: result }, null, 2));
       console.log(`✅ JSON generado: ${jsonPath}`);
+  // Copiar a docs/data para que GitHub Pages lo sirva
+  const docsDataDir = path.join(__dirname, '../../docs/data');
+  if (!fs.existsSync(docsDataDir)) fs.mkdirSync(docsDataDir, { recursive: true });
+  const docsJsonPath = path.join(docsDataDir, 'contabilidad.json');
+  fs.copyFileSync(jsonPath, docsJsonPath);
+  console.log(`✅ Copiado a: ${docsJsonPath}`);
       return jsonPath;
     } catch (err) {
       console.error('❌ Error parseando Excel:', err.message);

@@ -1,0 +1,47 @@
+{
+  "fuente": "Contabilida.xlsx",
+  "generado": "2025-11-08T04:22:25.115Z",
+  "hojas": {
+    "Hoja1": [
+      {
+        "RUT_Emisor": "76192801-K",
+        "Razon_Social_Emisor": "Proveedor A S.A.",
+        "Tipo_DTE": 33,
+        "Folio_DTE": 12345,
+        "Fecha_Emision": 45931,
+        "Fecha_Recepcion": 45935,
+        "Monto_Neto": 500000,
+        "Monto_IVA": 95000,
+        "Monto_Total": 595000,
+        "Estado_RCV": "Aceptado",
+        "Codigo_Impto": 1
+      },
+      {
+        "RUT_Emisor": "76200000-0",
+        "Razon_Social_Emisor": "Servicios B Ltda.",
+        "Tipo_DTE": 33,
+        "Folio_DTE": 56789,
+        "Fecha_Emision": 45945,
+        "Fecha_Recepcion": 45946,
+        "Monto_Neto": 100000,
+        "Monto_IVA": 19000,
+        "Monto_Total": 119000,
+        "Estado_RCV": "Aceptado",
+        "Codigo_Impto": 1
+      },
+      {
+        "RUT_Emisor": "99500000-1",
+        "Razon_Social_Emisor": "Almacen C",
+        "Tipo_DTE": 61,
+        "Folio_DTE": 101,
+        "Fecha_Emision": 45950,
+        "Fecha_Recepcion": 45951,
+        "Monto_Neto": -50000,
+        "Monto_IVA": -9500,
+        "Monto_Total": -59500,
+        "Estado_RCV": "Aceptado",
+        "Codigo_Impto": 1
+      }
+    ]
+  }
+}
