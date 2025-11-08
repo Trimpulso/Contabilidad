@@ -1,0 +1,431 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>🚨 Alertas de Seguridad - Sistema Contable</title>
+  <link rel="stylesheet" href="styles-enhanced.css" />
+  <style>
+    .alert-card {
+      background: white;
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      border-left: 4px solid;
+    }
+    
+    .alert-card.CRÍTICO {
+      border-left-color: #dc2626;
+      background: linear-gradient(to right, #fef2f2, white);
+    }
+    
+    .alert-card.MEDIO {
+      border-left-color: #f59e0b;
+      background: linear-gradient(to right, #fffbeb, white);
+    }
+    
+    .alert-card.BAJO {
+      border-left-color: #10b981;
+      background: linear-gradient(to right, #f0fdf4, white);
+    }
+    
+    .alert-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+    
+    .alert-badge {
+      padding: 0.25rem 0.75rem;
+      border-radius: 12px;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+    
+    .badge-CRÍTICO { background: #dc2626; color: white; }
+    .badge-MEDIO { background: #f59e0b; color: white; }
+    .badge-BAJO { background: #10b981; color: white; }
+    
+    .alert-detail {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+    
+    .alert-detail-item {
+      font-size: 0.9rem;
+    }
+    
+    .alert-detail-label {
+      color: #64748b;
+      font-size: 0.8rem;
+      margin-bottom: 0.25rem;
+    }
+    
+    .alert-detail-value {
+      font-weight: 600;
+      color: #0f172a;
+    }
+    
+    .alert-list {
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid #e2e8f0;
+    }
+    
+    .alert-item {
+      display: flex;
+      gap: 0.75rem;
+      margin-bottom: 0.75rem;
+      padding: 0.75rem;
+      background: #f8fafc;
+      border-radius: 6px;
+    }
+    
+    .alert-icon {
+      font-size: 1.5rem;
+      flex-shrink: 0;
+    }
+    
+    .alert-content {
+      flex: 1;
+    }
+    
+    .alert-tipo {
+      font-size: 0.75rem;
+      color: #64748b;
+      text-transform: uppercase;
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+    
+    .alert-mensaje {
+      font-size: 0.9rem;
+      color: #1e293b;
+      margin-bottom: 0.5rem;
+    }
+    
+    .alert-accion {
+      font-size: 0.85rem;
+      color: #475569;
+      padding: 0.5rem;
+      background: white;
+      border-radius: 4px;
+      border-left: 3px solid #0284c7;
+    }
+    
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    
+    .stat-card {
+      background: white;
+      padding: 1rem;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+    
+    .stat-value {
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 0.25rem;
+    }
+    
+    .stat-label {
+      font-size: 0.85rem;
+      color: #64748b;
+    }
+    
+    .recommendation {
+      background: #f1f5f9;
+      padding: 1rem;
+      border-radius: 6px;
+      margin-top: 1rem;
+      border-left: 4px solid #0284c7;
+    }
+    
+    .recommendation-title {
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      color: #0f172a;
+    }
+    
+    .loading {
+      text-align: center;
+      padding: 3rem;
+      color: #64748b;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-content">
+      <h1>🚨 Sistema de Alertas de Seguridad</h1>
+      <div class="meta">
+        <span id="userInfo"></span>
+        <button id="btnLogout" class="small hidden">Cerrar Sesión</button>
+        <a href="index.html" style="color: white; text-decoration: none;">← Volver al Dashboard</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Modal de Login -->
+  <div id="loginModal" class="modal hidden">
+    <div class="modal-content">
+      <h2>🔐 Iniciar Sesión</h2>
+      <form id="loginForm">
+        <input id="loginEmail" type="email" placeholder="Email" required value="admin@trimpulso.cl" />
+        <input id="loginPassword" type="password" placeholder="Contraseña" required value="demo123" />
+        <button type="submit">Entrar</button>
+      </form>
+    </div>
+  </div>
+
+  <section class="controls" style="margin-bottom: 2rem;">
+    <button id="btnRefresh">🔄 Actualizar</button>
+    <button id="btnExportPDF">📄 Exportar Reporte PDF</button>
+  </section>
+
+  <section style="max-width: 1400px; margin: 0 auto; padding: 0 2rem;">
+    <!-- Estadísticas Globales -->
+    <div id="statsContainer" class="stats-grid">
+      <!-- Se llena dinámicamente -->
+    </div>
+
+    <!-- Lista de Alertas -->
+    <div id="alertsContainer" class="loading">
+      Cargando alertas...
+    </div>
+  </section>
+
+  <footer>
+    <p>🚀 <strong>Sistema Contable Inteligente</strong> — Sistema de Alertas de Seguridad v2.0</p>
+  </footer>
+
+  <script>
+    const appState = {
+      token: localStorage.getItem('token'),
+      user: null,
+      apiBaseUrl: window.location.hostname === 'localhost' 
+        ? 'http://localhost:3000/api' 
+        : 'https://api.trimpulso.cl/api'
+    };
+
+    // Inicialización
+    document.addEventListener('DOMContentLoaded', () => {
+      if (appState.token) {
+        fetchUserProfile();
+      } else {
+        showLoginModal();
+      }
+
+      setupEventListeners();
+    });
+
+    function setupEventListeners() {
+      document.getElementById('loginForm').addEventListener('submit', handleLogin);
+      document.getElementById('btnLogout').addEventListener('click', handleLogout);
+      document.getElementById('btnRefresh').addEventListener('click', loadAlerts);
+      document.getElementById('btnExportPDF').addEventListener('click', exportPDF);
+    }
+
+    function showLoginModal() {
+      document.getElementById('loginModal').classList.remove('hidden');
+    }
+
+    async function handleLogin(e) {
+      e.preventDefault();
+      const email = document.getElementById('loginEmail').value;
+      const password = document.getElementById('loginPassword').value;
+
+      try {
+        const response = await fetch(`${appState.apiBaseUrl}/auth/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+
+        if (!response.ok) throw new Error('Login fallido');
+
+        const result = await response.json();
+        appState.token = result.token;
+        appState.user = result.user;
+        localStorage.setItem('token', result.token);
+        
+        document.getElementById('loginModal').classList.add('hidden');
+        updateUserUI();
+        loadAlerts();
+      } catch (error) {
+        alert('Error en login: ' + error.message);
+      }
+    }
+
+    function handleLogout() {
+      localStorage.removeItem('token');
+      appState.token = null;
+      appState.user = null;
+      location.reload();
+    }
+
+    async function fetchUserProfile() {
+      try {
+        const response = await fetch(`${appState.apiBaseUrl}/auth/me`, {
+          headers: { 'Authorization': `Bearer ${appState.token}` }
+        });
+
+        if (response.ok) {
+          appState.user = await response.json();
+          document.getElementById('loginModal').classList.add('hidden');
+          updateUserUI();
+          loadAlerts();
+        } else {
+          throw new Error('Token inválido');
+        }
+      } catch (error) {
+        localStorage.removeItem('token');
+        appState.token = null;
+        showLoginModal();
+      }
+    }
+
+    function updateUserUI() {
+      const userInfo = document.getElementById('userInfo');
+      const btnLogout = document.getElementById('btnLogout');
+      
+      if (appState.user) {
+        userInfo.textContent = `👤 ${appState.user.name}`;
+        btnLogout.classList.remove('hidden');
+      }
+    }
+
+    async function loadAlerts() {
+      try {
+        // Obtener estadísticas
+        const statsResponse = await fetch(`${appState.apiBaseUrl}/security/stats`, {
+          headers: { 'Authorization': `Bearer ${appState.token}` }
+        });
+        const stats = await statsResponse.json();
+        renderStats(stats);
+
+        // Obtener registros con alertas
+        const alertsResponse = await fetch(`${appState.apiBaseUrl}/records/with-alerts`, {
+          headers: { 'Authorization': `Bearer ${appState.token}` }
+        });
+        const alertsData = await alertsResponse.json();
+        renderAlerts(alertsData.records);
+      } catch (error) {
+        console.error('Error cargando alertas:', error);
+        document.getElementById('alertsContainer').innerHTML = 
+          '<p style="color: red;">Error al cargar alertas. Verifica que el servidor esté corriendo.</p>';
+      }
+    }
+
+    function renderStats(stats) {
+      const container = document.getElementById('statsContainer');
+      container.innerHTML = `
+        <div class="stat-card" style="border-top: 4px solid #0284c7;">
+          <div class="stat-value">${stats.total}</div>
+          <div class="stat-label">DTEs Analizados</div>
+        </div>
+        <div class="stat-card" style="border-top: 4px solid #dc2626;">
+          <div class="stat-value">${stats.bloqueados}</div>
+          <div class="stat-label">🚫 Bloqueados</div>
+        </div>
+        <div class="stat-card" style="border-top: 4px solid #f59e0b;">
+          <div class="stat-value">${stats.requierenAprobacion}</div>
+          <div class="stat-label">⚠️ Requieren Aprobación</div>
+        </div>
+        <div class="stat-card" style="border-top: 4px solid #10b981;">
+          <div class="stat-value">${stats.proveedoresConocidos}</div>
+          <div class="stat-label">Proveedores Conocidos</div>
+        </div>
+        <div class="stat-card" style="border-top: 4px solid #6366f1;">
+          <div class="stat-value">${stats.scorePromedio.toFixed(1)}</div>
+          <div class="stat-label">Score Promedio</div>
+        </div>
+      `;
+    }
+
+    function renderAlerts(records) {
+      const container = document.getElementById('alertsContainer');
+      
+      if (records.length === 0) {
+        container.innerHTML = '<p style="text-align: center; color: #64748b;">✅ No se detectaron alertas de seguridad</p>';
+        return;
+      }
+
+      container.innerHTML = records.map((record, index) => {
+        const analisis = record.analisisSeguridad;
+        
+        return `
+          <div class="alert-card ${analisis.nivel}">
+            <div class="alert-header">
+              <h3 style="margin: 0;">DTE #${record.id} - ${record.Razon_Social_Emisor}</h3>
+              <span class="alert-badge badge-${analisis.nivel}">
+                ${analisis.nivel} (${analisis.riesgoScore}/100)
+              </span>
+            </div>
+
+            <div class="alert-detail">
+              <div class="alert-detail-item">
+                <div class="alert-detail-label">RUT Emisor</div>
+                <div class="alert-detail-value">${record.RUT_Emisor}</div>
+              </div>
+              <div class="alert-detail-item">
+                <div class="alert-detail-label">Folio</div>
+                <div class="alert-detail-value">${record.Folio_DTE}</div>
+              </div>
+              <div class="alert-detail-item">
+                <div class="alert-detail-label">Monto</div>
+                <div class="alert-detail-value">$${record.Monto_Total.toLocaleString()}</div>
+              </div>
+              <div class="alert-detail-item">
+                <div class="alert-detail-label">Región</div>
+                <div class="alert-detail-value">${record.Region_Emisor || 'N/A'}</div>
+              </div>
+              <div class="alert-detail-item">
+                <div class="alert-detail-label">Estado</div>
+                <div class="alert-detail-value">${record.Estado_RCV}</div>
+              </div>
+              <div class="alert-detail-item">
+                <div class="alert-detail-label">Bloqueado</div>
+                <div class="alert-detail-value">${analisis.bloqueado ? '🚫 SÍ' : '✅ NO'}</div>
+              </div>
+            </div>
+
+            <div class="alert-list">
+              <strong style="font-size: 0.9rem;">Alertas Detectadas (${analisis.alertas.length}):</strong>
+              ${analisis.alertas.map(alerta => `
+                <div class="alert-item">
+                  <div class="alert-icon">${alerta.icono}</div>
+                  <div class="alert-content">
+                    <div class="alert-tipo">${alerta.tipo}</div>
+                    <div class="alert-mensaje">${alerta.mensaje}</div>
+                    <div class="alert-accion">💡 ${alerta.accion}</div>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+
+            <div class="recommendation">
+              <div class="recommendation-title">📋 Recomendación:</div>
+              <div>${analisis.recomendacion}</div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function exportPDF() {
+      alert('Función de exportación PDF en desarrollo. Usa el botón de impresión del navegador (Ctrl+P) por ahora.');
+    }
+  </script>
+</body>
+</html>

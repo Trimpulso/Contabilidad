@@ -73,6 +73,56 @@ npm run sync
 
 Deberías ver el listado de archivos de SharePoint.
 
+## Permisos Mínimos vs Extendidos
+
+| Objetivo | Permisos de aplicación necesarios | Comentario |
+|----------|-----------------------------------|------------|
+| Descargar archivo vía enlace (shares API) | Files.Read.All | Suficiente para `GET /shares/{shareId}/driveItem/content` |
+| Listar contenido de sitios SharePoint | Sites.Read.All + Files.Read.All | `Sites.Read.All` para estructura, `Files.Read.All` para contenido |
+| Escribir (subir/actualizar) archivos | Files.ReadWrite.All (y opcional Sites.ReadWrite.All) | Requiere consentimiento admin |
+
+Si tienes problemas, empieza sólo con `Files.Read.All` y concede consentimiento; prueba la descarga por enlace. Si sigue fallando, añade también `Sites.Read.All`.
+
+## Verificando el Consentimiento
+
+Tras pulsar "Conceder consentimiento de administrador":
+1. El estado debe cambiar a "Concedido para Trimpulso".
+2. Si no cambia tras unos segundos, pulsa en "Actualizar".
+3. Espera hasta 5 minutos para propagación antes de reintentar el script.
+
+## Reintentar la Descarga por Enlace
+
+Una vez concedido el consentimiento, ejecuta:
+
+```powershell
+cd connectors/sharepoint
+npm run sync -- "<TU_LINK_COMPLETO_DE_SHAREPOINT>"
+```
+
+Salida esperada (ejemplo):
+```
+🔗 Descarga por enlace compartido...
+📄 Archivo: Contabilidad.xlsx
+✅ Descargado en: .../data/Contabilidad.xlsx
+```
+
+## Alternativa: Autenticación Delegada (Device Code Flow)
+
+Si no puedes obtener consentimiento de administrador:
+
+1. Agrega permisos delegados: Files.Read, offline_access.
+2. Implementar script de Device Code que genere un código y URL para login.
+3. El usuario inicia sesión y el script obtiene un token con alcance de lectura.
+
+Esta alternativa sólo da acceso a los datos del usuario autenticado, NO a todos los sitios.
+
+## Próximos Pasos Sugeridos
+
+1. Conceder consentimiento admin a Files.Read.All (y Sites.Read.All si quieres listar).
+2. Ejecutar descarga por enlace.
+3. Confirmar archivo guardado en `data/`.
+4. (Luego) Procesar el Excel y alimentar el dashboard.
+
 ## Ayuda Adicional
 
 ### Si ves error "General exception while processing"

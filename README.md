@@ -1,48 +1,111 @@
 # Sistema Contable Inteligente 📊
 
-**Dashboard contable en vivo con sincronización automática desde SharePoint.**
+**Dashboard contable full-stack con API REST, autenticación JWT y sincronización desde SharePoint.**
 
 [![Dashboard](https://img.shields.io/badge/Dashboard-Online-blue?style=flat-square)](https://trimpulso.github.io/Contabilidad/)
+[![API](https://img.shields.io/badge/API-Docs-green?style=flat-square)](https://github.com/Trimpulso/Contabilidad/blob/main/docs/API.md)
 [![GitHub](https://img.shields.io/badge/Repo-GitHub-black?style=flat-square)](https://github.com/Trimpulso/Contabilidad)
 [![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)](LICENSE)
 
 ## 🎯 Características
 
-✅ **Dashboard en tiempo real** — Gráficos interactivos (barras, líneas, tortas)  
-✅ **Sincronización SharePoint** — Descarga automática de Excel vía enlace compartido  
-✅ **Responsivo** — Funciona en desktop, tablet y móvil  
-✅ **Sin backend** — Estático en GitHub Pages  
-✅ **Agregaciones dinámicas** — Suma, promedio, máximo por categoría  
+### Frontend
+✅ **Dashboard interactivo** — Gráficos Chart.js (barras, líneas, tortas)  
+✅ **Tabla Pivote** — Análisis dinámico con filas/columnas/valores configurables  
+✅ **Exportación PDF** — Genera reportes descargables del dashboard  
 ✅ **Exportación CSV** — Descarga datos filtrados  
-✅ **Conversión de fechas** — Seriales Excel → ISO (YYYY-MM-DD)  
+✅ **Autenticación** — Login con JWT o modo offline con JSON estático  
+✅ **Responsivo** — Mobile-first design con CSS Grid  
+
+### Backend
+✅ **API REST** — Express.js con endpoints protegidos  
+✅ **JWT Auth** — Sistema de sesiones con tokens de 24h  
+✅ **Estadísticas** — Resumen, por mes, por proveedor  
+✅ **Filtros** — Por RUT, fecha, estado, con paginación  
+✅ **Seguridad** — Helmet, CORS, Rate Limiting (100 req/15min)  
+✅ **In-Memory DB** — Carga datos desde JSON (migrable a SQL)  
+
+### Integración SharePoint
+✅ **OAuth2** — Autenticación con Azure AD  
+✅ **Microsoft Graph API** — Descarga automática de Excel  
+✅ **Conversión fechas** — Seriales Excel → ISO (YYYY-MM-DD)  
+✅ **Auto-deploy** — Copia a `docs/data/` para GitHub Pages  
 
 ## 🚀 Acceso Rápido
 
-**Dashboard en vivo:**  
+**🌐 Dashboard en vivo:**  
 👉 https://trimpulso.github.io/Contabilidad/
 
-**Repositorio:**  
+**📚 Documentación API:**  
+👉 [API.md](docs/API.md)
+
+**📂 Repositorio:**  
 👉 https://github.com/Trimpulso/Contabilidad
 
-## 📖 Guía de Uso del Dashboard
+## 📖 Guía de Uso
 
-### 1. Seleccionar Datos
-- **Hoja**: Elige entre múltiples hojas del Excel
-- **Categoría**: Selecciona columna de texto para agrupar
-- **Valor**: Selecciona columna numérica para agregar
+### Dashboard Frontend
 
-### 2. Visualización
-- **Tipo Gráfico**: Alterna entre Barras / Línea / Torta
-- **Filtro**: Busca en tiempo real en la tabla
-- **Estadísticas**: Ve Registros, Suma, Promedio, Máximo
+#### 1️⃣ Autenticación (Opcional)
+- **Login**: `admin@trimpulso.cl` / `demo123` para usar API
+- **Offline**: Click "Continuar sin login" para usar JSON estático
 
-### 3. Acciones
-- 📥 **CSV**: Exporta datos filtrados
-- 🔄 **Refrescar**: Recalcula los datos
+#### 2️⃣ Visualización
+- **Hoja**: Selecciona sheet del Excel
+- **Categoría**: Columna para agrupar (ej: Razón Social)
+- **Valor**: Columna numérica para sumar (ej: Monto Total)
+- **Tipo Gráfico**: Barras / Línea / Torta
+- **Filtro**: Búsqueda en tiempo real
+
+#### 3️⃣ Tabla Pivote
+- Click **🔄 Tabla Pivote**
+- Selecciona:
+  - **Filas**: Categoría principal (ej: Proveedor)
+  - **Columnas**: Categoría secundaria (ej: Tipo DTE)
+  - **Valores**: Campo a sumar (ej: Monto Total)
+- Visualiza matriz cruzada con totales
+
+#### 4️⃣ Exportar
+- **📥 CSV**: Descarga datos filtrados como Excel
+- **� PDF**: Genera snapshot del dashboard actual
+
+### Backend API
+
+#### Instalación
+```bash
+cd backend
+npm install
+npm start
+```
+
+Servidor: `http://localhost:3000`
+
+#### Ejemplo de Uso
+
+```javascript
+// Login
+const response = await fetch('http://localhost:3000/api/auth/login', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    email: 'admin@trimpulso.cl',
+    password: 'demo123'
+  })
+});
+
+const { token } = await response.json();
+
+// Obtener registros
+const records = await fetch('http://localhost:3000/api/records?page=1&limit=50', {
+  headers: { 'Authorization': `Bearer ${token}` }
+});
+```
+
+**Más ejemplos**: [API.md](docs/API.md)
 
 ## 🔄 Actualizar Datos desde SharePoint
 
-Ejecuta el script de sincronización desde tu terminal:
+Ejecuta el script de sincronización:
 
 ```bash
 cd connectors/sharepoint

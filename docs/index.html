@@ -4,16 +4,35 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Dashboard Contabilidad Inteligente</title>
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="styles-enhanced.css" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
 <body>
+  <!-- Login Modal -->
+  <div id="loginModal" class="modal hidden">
+    <div class="modal-content">
+      <h2>🔐 Iniciar Sesión</h2>
+      <form id="loginForm">
+        <input id="loginEmail" type="email" placeholder="Email" required />
+        <input id="loginPassword" type="password" placeholder="Contraseña" required />
+        <button type="submit">Entrar</button>
+        <p class="hint">Demo: admin@trimpulso.cl / demo123</p>
+      </form>
+      <button id="btnSkipLogin" class="secondary">Continuar sin login (solo JSON)</button>
+    </div>
+  </div>
+
   <header>
     <div class="header-content">
       <h1>📊 Dashboard Contabilidad</h1>
       <div class="meta">
         <span id="fuente">Fuente: —</span>
         <span id="generado">Actualizado: —</span>
+        <span id="userInfo" class="hidden"></span>
+        <a href="alertas.html" style="color: white; text-decoration: underline;">🚨 Ver Alertas</a>
+        <button id="btnLogout" class="hidden small">Cerrar Sesión</button>
       </div>
     </div>
   </header>
@@ -47,7 +66,9 @@
         </select>
       </label>
       <button id="btnExport">📥 CSV</button>
+      <button id="btnExportPDF">📄 PDF</button>
       <button id="btnRefresh">🔄 Refrescar</button>
+      <button id="btnPivot">🔄 Tabla Pivote</button>
     </div>
   </section>
 
@@ -71,13 +92,27 @@
   </section>
 
   <section class="grid">
-    <div class="panel panel-lg">
+    <div class="panel panel-lg" id="chartPanel">
       <h3>Visualización</h3>
       <canvas id="chart" height="80"></canvas>
     </div>
     <div class="panel panel-sm">
       <h3>Resumen</h3>
       <div id="summary"></div>
+    </div>
+  </section>
+
+  <!-- Tabla Pivote (oculta por defecto) -->
+  <section id="pivotSection" class="grid hidden">
+    <div class="panel panel-full">
+      <h3>📊 Tabla Pivote</h3>
+      <div class="pivot-controls">
+        <label>Filas: <select id="pivotRows"></select></label>
+        <label>Columnas: <select id="pivotCols"></select></label>
+        <label>Valores: <select id="pivotVals"></select></label>
+        <button id="btnClosePivot">Cerrar</button>
+      </div>
+      <div id="pivotTable"></div>
     </div>
   </section>
 
@@ -89,10 +124,10 @@
   </section>
 
   <footer>
-    <p>🚀 <strong>Sistema Contable Inteligente</strong> — GitHub Pages | Datos: <code>docs/data/contabilidad.json</code></p>
+    <p>🚀 <strong>Sistema Contable Inteligente</strong> — GitHub Pages | Datos: <code id="dataSource">docs/data/contabilidad.json</code></p>
     <p style="font-size: 11px; opacity: 0.7;">Última sincronización: <span id="syncTime">—</span></p>
   </footer>
 
-  <script src="app.js"></script>
+  <script src="app-enhanced.js"></script>
 </body>
 </html>

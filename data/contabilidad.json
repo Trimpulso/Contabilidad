@@ -1,46 +1,82 @@
 {
   "fuente": "Contabilida.xlsx",
-  "generado": "2025-11-08T04:41:05.040Z",
+  "generado": "2025-11-08T06:00:00.000Z",
   "hojas": {
     "Hoja1": [
       {
         "RUT_Emisor": "76192801-K",
         "Razon_Social_Emisor": "Proveedor A S.A.",
-        "Tipo_DTE": 33,
-        "Folio_DTE": 12345,
+        "Tipo_DTE": "Factura Electrónica",
+        "Folio_DTE": "1234",
         "Fecha_Emision": "2025-10-01",
-        "Fecha_Recepcion": "2025-10-05",
+        "Fecha_Recepcion": "2025-10-02",
         "Monto_Neto": 500000,
         "Monto_IVA": 95000,
         "Monto_Total": 595000,
-        "Estado_RCV": "Aceptado",
-        "Codigo_Impto": 1
+        "Estado_RCV": "Registrada",
+        "Codigo_Impto": "IVA",
+        "Region_Emisor": "Metropolitana",
+        "Es_Nuevo_Proveedor": "NO"
       },
       {
-        "RUT_Emisor": "76200000-0",
-        "Razon_Social_Emisor": "Servicios B Ltda.",
-        "Tipo_DTE": 33,
-        "Folio_DTE": 56789,
+        "RUT_Emisor": "77654321-9",
+        "Razon_Social_Emisor": "Proveedor B Ltda.",
+        "Tipo_DTE": "Factura Electrónica",
+        "Folio_DTE": "5678",
         "Fecha_Emision": "2025-10-15",
         "Fecha_Recepcion": "2025-10-16",
+        "Monto_Neto": 500000,
+        "Monto_IVA": 95000,
+        "Monto_Total": 595000,
+        "Estado_RCV": "Registrada",
+        "Codigo_Impto": "IVA",
+        "Region_Emisor": "Metropolitana",
+        "Es_Nuevo_Proveedor": "NO"
+      },
+      {
+        "RUT_Emisor": "88999888-7",
+        "Razon_Social_Emisor": "Empresa Fantasma SpA",
+        "Tipo_DTE": "Factura Electrónica",
+        "Folio_DTE": "9999",
+        "Fecha_Emision": "2025-11-01",
+        "Fecha_Recepcion": "2025-11-01",
+        "Monto_Neto": 15000000,
+        "Monto_IVA": 2850000,
+        "Monto_Total": 17850000,
+        "Estado_RCV": "Pendiente",
+        "Codigo_Impto": "IVA",
+        "Region_Emisor": "Magallanes",
+        "Es_Nuevo_Proveedor": "SI"
+      },
+      {
+        "RUT_Emisor": "99888777-K",
+        "Razon_Social_Emisor": "Proveedor Dudoso Ltda.",
+        "Tipo_DTE": "Factura Electrónica",
+        "Folio_DTE": "1111",
+        "Fecha_Emision": "2025-11-05",
+        "Fecha_Recepcion": "2025-11-05",
+        "Monto_Neto": 25000000,
+        "Monto_IVA": 4750000,
+        "Monto_Total": 29750000,
+        "Estado_RCV": "Pendiente",
+        "Codigo_Impto": "IVA",
+        "Region_Emisor": "Arica",
+        "Es_Nuevo_Proveedor": "SI"
+      },
+      {
+        "RUT_Emisor": "76192801-K",
+        "Razon_Social_Emisor": "Proveedor A S.A.",
+        "Tipo_DTE": "Boleta Electrónica",
+        "Folio_DTE": "2222",
+        "Fecha_Emision": "2025-11-07",
+        "Fecha_Recepcion": "2025-11-07",
         "Monto_Neto": 100000,
         "Monto_IVA": 19000,
         "Monto_Total": 119000,
-        "Estado_RCV": "Aceptado",
-        "Codigo_Impto": 1
-      },
-      {
-        "RUT_Emisor": "99500000-1",
-        "Razon_Social_Emisor": "Almacen C",
-        "Tipo_DTE": 61,
-        "Folio_DTE": 101,
-        "Fecha_Emision": "2025-10-20",
-        "Fecha_Recepcion": "2025-10-21",
-        "Monto_Neto": -50000,
-        "Monto_IVA": -9500,
-        "Monto_Total": -59500,
-        "Estado_RCV": "Aceptado",
-        "Codigo_Impto": 1
+        "Estado_RCV": "Registrada",
+        "Codigo_Impto": "IVA",
+        "Region_Emisor": "Metropolitana",
+        "Es_Nuevo_Proveedor": "NO"
       }
     ]
   }
