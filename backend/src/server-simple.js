@@ -20,25 +20,29 @@ const JWT_SECRET = process.env.JWT_SECRET || 'secret-key-cambiar-en-produccion';
 const alertSystem = new SecurityAlertSystem();
 
 // In-memory storage (reemplazar con DB en producción)
-let users = [
-  {
-    id: 1,
-    email: 'admin@trimpulso.cl',
-    password: await bcrypt.hash('demo123', 10),
-    name: 'Administrador',
-    role: 'admin'
-  },
-  {
-    id: 2,
-    email: 'user@trimpulso.cl',
-    password: await bcrypt.hash('demo123', 10),
-    name: 'Usuario Demo',
-    role: 'user'
-  }
-];
-
+let users = [];
 let sessions = [];
 let records = [];
+
+// Inicializar usuarios con contraseñas hasheadas
+async function initializeUsers() {
+  users = [
+    {
+      id: 1,
+      email: 'admin@trimpulso.cl',
+      password: await bcrypt.hash('demo123', 10),
+      name: 'Administrador',
+      role: 'admin'
+    },
+    {
+      id: 2,
+      email: 'user@trimpulso.cl',
+      password: await bcrypt.hash('demo123', 10),
+      name: 'Usuario Demo',
+      role: 'user'
+    }
+  ];
+}
 
 // Cargar datos desde JSON
 async function loadData() {
@@ -439,10 +443,25 @@ app.use((req, res) => {
 });
 
 // Start server
+await initializeUsers();
 await loadData();
 
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
   console.log(`🚀 Servidor ejecutándose en http://localhost:${PORT}`);
   console.log(`📊 Registros cargados: ${records.length}`);
   console.log(`👥 Usuarios disponibles: ${users.map(u => u.email).join(', ')}`);
+});
+
+// Mantener el proceso activo
+process.on('uncaughtException', (err) => {
+  console.error('❌ Excepción no capturada:', err);
+});
+
+process.on('unhandledRejection', (err) => {
+  console.error('❌ Promesa rechazada no manejada:', err);
+});
+
+// Prevenir que el proceso salga
+server.on('error', (err) => {
+  console.error('❌ Error del servidor:', err);
 });

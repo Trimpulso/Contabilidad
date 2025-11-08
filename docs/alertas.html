@@ -171,6 +171,7 @@
       <div class="meta">
         <span id="userInfo"></span>
         <button id="btnLogout" class="small hidden">Cerrar Sesión</button>
+        <button id="btnConfigServer" class="small" title="Configurar URL del servidor">⚙️ Servidor</button>
         <a href="index.html" style="color: white; text-decoration: none;">← Volver al Dashboard</a>
       </div>
     </div>
@@ -213,10 +214,29 @@
     const appState = {
       token: localStorage.getItem('token'),
       user: null,
-      apiBaseUrl: window.location.hostname === 'localhost' 
+      apiBaseUrl: localStorage.getItem('apiBaseUrl') || (window.location.hostname === 'localhost' 
         ? 'http://localhost:3000/api' 
-        : 'https://api.trimpulso.cl/api'
+        : 'http://localhost:3000/api')  // Por defecto usa localhost
     };
+
+    // Detectar si estamos en GitHub Pages
+    const isGitHubPages = window.location.hostname.includes('github.io');
+    
+    // Si estamos en GitHub Pages y no hay URL configurada, mostrar opción de configuración
+    if (isGitHubPages && !localStorage.getItem('apiBaseUrl')) {
+      const userUrl = prompt(
+        'Dashboard en GitHub Pages detectado.\n\n' +
+        'Ingresa la URL del servidor backend\n' +
+        '(ej: http://localhost:3000/api o http://tu-servidor:3000/api)\n\n' +
+        'Por defecto: http://localhost:3000/api',
+        'http://localhost:3000/api'
+      );
+      
+      if (userUrl) {
+        localStorage.setItem('apiBaseUrl', userUrl);
+        appState.apiBaseUrl = userUrl;
+      }
+    }
 
     // Inicialización
     document.addEventListener('DOMContentLoaded', () => {
@@ -234,9 +254,25 @@
       document.getElementById('btnLogout').addEventListener('click', handleLogout);
       document.getElementById('btnRefresh').addEventListener('click', loadAlerts);
       document.getElementById('btnExportPDF').addEventListener('click', exportPDF);
+      document.getElementById('btnConfigServer').addEventListener('click', configureServer);
     }
 
-    function showLoginModal() {
+    function configureServer() {
+      const currentUrl = localStorage.getItem('apiBaseUrl') || appState.apiBaseUrl;
+      const newUrl = prompt(
+        'Ingresa la URL del servidor backend:\n\n' +
+        'Actual: ' + currentUrl + '\n\n' +
+        'Ej: http://localhost:3000/api',
+        currentUrl
+      );
+      
+      if (newUrl && newUrl.trim()) {
+        localStorage.setItem('apiBaseUrl', newUrl.trim());
+        appState.apiBaseUrl = newUrl.trim();
+        alert('✅ URL configurada: ' + newUrl.trim() + '\n\nRecarga la página para aplicar cambios.');
+        location.reload();
+      }
+    }    function showLoginModal() {
       document.getElementById('loginModal').classList.remove('hidden');
     }
 
