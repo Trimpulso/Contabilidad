@@ -331,19 +331,44 @@ class ChatbotCAI {
   }
 
   /**
-   * INTENT 6: Info Proveedor (MEJORADO)
+   * INTENT 6: Info Proveedor (MEJORADO - BÚSQUEDA FLEXIBLE)
    */
   getProveedorInfo(userText) {
-    // Buscar si menciona RUT o nombre
-    const rutMatch = userText.match(/\d{1,2}\.\d{3}\.\d{3}-\d{1}/);
-    const rutBuscado = rutMatch ? rutMatch[0] : null;
+    // Buscar si menciona RUT (con formato flexible)
+    const rutMatch = userText.match(/\d{1,2}\.?\d{3}\.?\d{3}-?[0-9K]/i);
+    let rutBuscado = rutMatch ? rutMatch[0] : null;
     
-    const proveedor = this.datosProveedores.find(p => 
-      rutBuscado ? p.rut === rutBuscado : userText.toLowerCase().includes(p.nombre.toLowerCase())
-    );
+    // Normalizar RUT (convertir a formato con puntos y guion)
+    if (rutBuscado) {
+      rutBuscado = rutBuscado.replace(/\./g, '').replace(/-/g, '');
+      rutBuscado = rutBuscado.slice(0, -1) + '-' + rutBuscado.slice(-1);
+      // Agregar puntos si no los tiene
+      if (!rutBuscado.includes('.')) {
+        rutBuscado = rutBuscado.slice(0, 2) + '.' + rutBuscado.slice(2, 5) + '.' + rutBuscado.slice(5);
+      }
+    }
+    
+    let proveedor = null;
+
+    // Primero buscar por RUT si lo encuentra
+    if (rutBuscado) {
+      proveedor = this.datosProveedores.find(p => p.rut.toLowerCase() === rutBuscado.toLowerCase());
+    }
+
+    // Si no encuentra por RUT, buscar por nombre (búsqueda flexible)
+    if (!proveedor) {
+      const textoBusqueda = userText.toLowerCase();
+      proveedor = this.datosProveedores.find(p => {
+        const nombreBajo = p.nombre.toLowerCase();
+        // Buscar coincidencias parciales
+        const palabras = p.nombre.toLowerCase().split(' ');
+        return palabras.some(palabra => textoBusqueda.includes(palabra)) || 
+               textoBusqueda.includes(nombreBajo);
+      });
+    }
 
     if (!proveedor) {
-      return `❌ No encontré información del proveedor. Intenta con:\n\n1. Un RUT (ej: "12.345.678-9")\n2. Un nombre (ej: "Proveedor A")`;
+      return `❌ No encontré información del proveedor.\n\n📋 Proveedores disponibles:\n1. Proveedor A S.A.\n2. Proveedor B Ltda.\n3. Empresa Fantasma SpA\n4. Proveedor Dudoso Ltda.\n\nIntenta con:\n• Nombre completo: "Empresa Fantasma SpA"\n• RUT: "88999888-7"`;
     }
 
     const riesgoEmoji = proveedor.riesgo === 'CRÍTICO' ? '🚫' : '✅';
