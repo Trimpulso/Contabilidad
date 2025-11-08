@@ -1,0 +1,543 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Dashboard KPIs - Análisis de Control</title>
+  <link rel="stylesheet" href="styles-enhanced.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <style>
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .kpi-card {
+      background: white;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .kpi-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, #0284c7, #0369a1);
+    }
+
+    .kpi-value {
+      font-size: 32px;
+      font-weight: 700;
+      color: #0284c7;
+      margin: 12px 0;
+    }
+
+    .kpi-label {
+      font-size: 13px;
+      color: #6b7280;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+    }
+
+    .kpi-change {
+      font-size: 12px;
+      padding: 4px 8px;
+      border-radius: 4px;
+      display: inline-block;
+      margin-top: 8px;
+    }
+
+    .kpi-change.positive {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .kpi-change.negative {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .chart-container {
+      position: relative;
+      height: 300px;
+      margin-bottom: 24px;
+    }
+
+    .section-title {
+      font-size: 20px;
+      font-weight: 600;
+      color: #111827;
+      margin: 24px 0 16px;
+      padding-bottom: 12px;
+      border-bottom: 3px solid #0284c7;
+    }
+
+    .metrics-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .metrics-table thead {
+      background: #0284c7;
+      color: white;
+    }
+
+    .metrics-table th,
+    .metrics-table td {
+      padding: 12px 16px;
+      text-align: left;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    .metrics-table tbody tr:hover {
+      background: #f9fafb;
+    }
+
+    .metric-badge {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .badge-high {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .badge-medium {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    .badge-low {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-top: 24px;
+    }
+
+    @media(max-width: 768px) {
+      .kpi-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .grid-2 {
+        grid-template-columns: 1fr;
+      }
+
+      .metrics-table th,
+      .metrics-table td {
+        padding: 8px 12px;
+        font-size: 12px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-content">
+      <h1>📈 Dashboard de KPIs - Análisis de Control</h1>
+      <div class="meta">
+        <span>Módulo de Análisis Avanzado</span>
+        <a href="index.html" style="color: white; text-decoration: underline;">← Volver al Dashboard</a>
+      </div>
+    </div>
+  </header>
+
+  <section class="controls" style="max-width: 1400px; margin: 0 auto;">
+    <div class="control-row">
+      <label>
+        📅 Período:
+        <select id="periodSelect">
+          <option value="month">Mes Actual</option>
+          <option value="quarter">Trimestre</option>
+          <option value="year">Año</option>
+        </select>
+      </label>
+      <button id="btnExport">📥 Exportar Reporte</button>
+      <button id="btnRefresh">🔄 Refrescar</button>
+    </div>
+  </section>
+
+  <div style="max-width: 1400px; margin: 0 auto; padding: 16px;">
+    <!-- SECCIÓN 1: KPIs DE PROVEEDORES -->
+    <h2 class="section-title">📦 KPIs de Proveedores (Cuenta 400)</h2>
+
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-label">Deuda Total Pendiente</div>
+        <div class="kpi-value">$48.9M</div>
+        <div class="kpi-change negative">↑ 12% vs. mes anterior</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Proveedores Activos</div>
+        <div class="kpi-value">4</div>
+        <div class="kpi-change positive">→ Sin cambios</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Gasto Promedio por Proveedor</div>
+        <div class="kpi-value">$12.2M</div>
+        <div class="kpi-change positive">↓ 8% vs. mes anterior</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Plazo Pago Promedio (días)</div>
+        <div class="kpi-value">28</div>
+        <div class="kpi-change positive">↓ 3 días vs. promedio</div>
+      </div>
+    </div>
+
+    <!-- Gráfico: Tendencia de Deuda Pendiente -->
+    <div class="panel" style="background: white; border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px; margin-bottom: 24px;">
+      <h3>Tendencia de Deuda Pendiente (Últimos 6 Meses)</h3>
+      <div class="chart-container">
+        <canvas id="deudaChart"></canvas>
+      </div>
+    </div>
+
+    <!-- Gráfico: Gastos por Categoría -->
+    <div class="grid-2">
+      <div class="panel" style="background: white; border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px;">
+        <h3>Gasto por Proveedor</h3>
+        <div class="chart-container">
+          <canvas id="proveedorChart"></canvas>
+        </div>
+      </div>
+
+      <div class="panel" style="background: white; border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px;">
+        <h3>Proyección de Flujo de Caja (Próximos 3 Meses)</h3>
+        <div class="chart-container">
+          <canvas id="flujoChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabla: Detalles por Proveedor -->
+    <div style="margin-top: 24px;">
+      <h3>Detalle de Proveedores</h3>
+      <table class="metrics-table">
+        <thead>
+          <tr>
+            <th>Proveedor</th>
+            <th>RUT</th>
+            <th>Deuda Actual</th>
+            <th>Facturas Pendientes</th>
+            <th>Días de Atraso</th>
+            <th>Estado</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Proveedor A S.A.</td>
+            <td>76192801-K</td>
+            <td>$19.2M</td>
+            <td>3</td>
+            <td>0</td>
+            <td><span class="metric-badge badge-high">Al Día</span></td>
+          </tr>
+          <tr>
+            <td>Proveedor B Ltda.</td>
+            <td>77654321-9</td>
+            <td>$9.8M</td>
+            <td>2</td>
+            <td>5</td>
+            <td><span class="metric-badge badge-medium">Próximo Vencimiento</span></td>
+          </tr>
+          <tr>
+            <td>Empresa Fantasma SpA</td>
+            <td>88999888-7</td>
+            <td>$17.85M</td>
+            <td>1</td>
+            <td>15</td>
+            <td><span class="metric-badge badge-low">En Riesgo</span></td>
+          </tr>
+          <tr>
+            <td>Proveedor Dudoso Ltda.</td>
+            <td>99888777-K</td>
+            <td>$2.05M</td>
+            <td>1</td>
+            <td>8</td>
+            <td><span class="metric-badge badge-medium">Monitoreo</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- SECCIÓN 2: KPIs DE PROCESOS -->
+    <h2 class="section-title">⚙️ KPIs de Procesos (Eficiencia)</h2>
+
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-label">Tiempo Ahorrado/Cliente</div>
+        <div class="kpi-value">4.5h</div>
+        <div class="kpi-change positive">↑ 18% vs. mes anterior</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Facturas Automatizadas</div>
+        <div class="kpi-value">92%</div>
+        <div class="kpi-change positive">↑ 5% vs. mes anterior</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Facturas Manuales</div>
+        <div class="kpi-value">8%</div>
+        <div class="kpi-change positive">↓ 5% vs. mes anterior</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Tasa de Errores</div>
+        <div class="kpi-value">0.2%</div>
+        <div class="kpi-change positive">↓ 0.1% vs. mes anterior</div>
+      </div>
+    </div>
+
+    <!-- Gráfico: Automatización vs Manual -->
+    <div class="grid-2">
+      <div class="panel" style="background: white; border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px;">
+        <h3>Volumen: Automatizadas vs Manuales (Últimos 6 Meses)</h3>
+        <div class="chart-container">
+          <canvas id="automatizacionChart"></canvas>
+        </div>
+      </div>
+
+      <div class="panel" style="background: white; border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px;">
+        <h3>Tiempo Ahorrado Acumulado (Horas)</h3>
+        <div class="chart-container">
+          <canvas id="tiempoAhorradoChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabla: Métricas de Eficiencia -->
+    <div style="margin-top: 24px;">
+      <h3>Métricas Detalladas de Procesos</h3>
+      <table class="metrics-table">
+        <thead>
+          <tr>
+            <th>Métrica</th>
+            <th>Valor Actual</th>
+            <th>Meta Mensual</th>
+            <th>% Cumplimiento</th>
+            <th>Tendencia</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Tiempo de Contabilización Promedio</td>
+            <td>2.1 horas</td>
+            <td>2.0 horas</td>
+            <td>95%</td>
+            <td><span class="metric-badge badge-high">✓ En Objetivo</span></td>
+          </tr>
+          <tr>
+            <td>Volumen de Facturas Procesadas/Día</td>
+            <td>125</td>
+            <td>100</td>
+            <td>125%</td>
+            <td><span class="metric-badge badge-high">✓ Superado</span></td>
+          </tr>
+          <tr>
+            <td>Precisión de Clasificación</td>
+            <td>99.8%</td>
+            <td>99.5%</td>
+            <td>100%</td>
+            <td><span class="metric-badge badge-high">✓ Excelente</span></td>
+          </tr>
+          <tr>
+            <td>Facturas Rechazadas por Errores</td>
+            <td>0.2%</td>
+            <td>0.5%</td>
+            <td>60%</td>
+            <td><span class="metric-badge badge-low">⚠ Alerta</span></td>
+          </tr>
+          <tr>
+            <td>Cumplimiento de Plazos</td>
+            <td>98%</td>
+            <td>95%</td>
+            <td>103%</td>
+            <td><span class="metric-badge badge-high">✓ Superado</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Resumen Ejecutivo -->
+    <div style="background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border: 2px solid #0284c7; border-radius: 8px; padding: 24px; margin-top: 32px; margin-bottom: 32px;">
+      <h3 style="color: #0284c7; margin-top: 0;">📊 Resumen Ejecutivo</h3>
+      <ul style="line-height: 1.8; font-size: 14px;">
+        <li><strong>Eficiencia General:</strong> El sistema ha automatizado el 92% de las facturas, reduciendo el tiempo de contabilización en 4.5 horas por cliente mensualmente.</li>
+        <li><strong>Gestión de Proveedores:</strong> La deuda total pendiente es de $48.9M con 4 proveedores activos. El plazo promedio de pago es de 28 días.</li>
+        <li><strong>Riesgos Identificados:</strong> 2 proveedores (Empresa Fantasma y Proveedor Dudoso) requieren monitoreo especial por días de atraso.</li>
+        <li><strong>Proyección:</strong> Se espera continuar mejorando la automatización a 95% en el próximo mes.</li>
+      </ul>
+    </div>
+  </div>
+
+  <footer>
+    <p>🚀 <strong>Sistema Contable Inteligente</strong> — Dashboard de KPIs | Actualizado: <span id="updateTime">—</span></p>
+  </footer>
+
+  <script>
+    // Datos simulados (en producción vendrían del API)
+    const kpisData = {
+      months: ['Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov'],
+      deuda: [42.3, 43.1, 44.5, 46.2, 47.8, 48.9],
+      automatizadas: [78, 82, 85, 88, 90, 92],
+      manuales: [22, 18, 15, 12, 10, 8],
+      tiempoAhorrado: [2.1, 2.3, 2.8, 3.2, 3.8, 4.5],
+      flujoMeses: ['Dic', 'Ene', 'Feb'],
+      flujoProyectado: [52.3, 48.1, 45.6]
+    };
+
+    // Configuración de gráficos
+    const chartConfig = {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          display: true,
+          position: 'bottom'
+        }
+      }
+    };
+
+    // Gráfico 1: Tendencia de Deuda
+    new Chart(document.getElementById('deudaChart'), {
+      type: 'line',
+      data: {
+        labels: kpisData.months,
+        datasets: [{
+          label: 'Deuda Pendiente ($M)',
+          data: kpisData.deuda,
+          borderColor: '#dc2626',
+          backgroundColor: 'rgba(220, 38, 38, 0.1)',
+          borderWidth: 3,
+          fill: true,
+          tension: 0.4,
+          pointRadius: 6,
+          pointBackgroundColor: '#dc2626'
+        }]
+      },
+      options: {
+        ...chartConfig,
+        scales: {
+          y: {
+            beginAtZero: false,
+            title: { display: true, text: 'Millones $' }
+          }
+        }
+      }
+    });
+
+    // Gráfico 2: Gastos por Proveedor
+    new Chart(document.getElementById('proveedorChart'), {
+      type: 'doughnut',
+      data: {
+        labels: ['Proveedor A', 'Proveedor B', 'Empresa Fantasma', 'Proveedor Dudoso'],
+        datasets: [{
+          data: [19.2, 9.8, 17.85, 2.05],
+          backgroundColor: ['#0284c7', '#06b6d4', '#f59e0b', '#ef4444']
+        }]
+      },
+      options: chartConfig
+    });
+
+    // Gráfico 3: Proyección de Flujo de Caja
+    new Chart(document.getElementById('flujoChart'), {
+      type: 'bar',
+      data: {
+        labels: kpisData.flujoMeses,
+        datasets: [{
+          label: 'Deuda Proyectada ($M)',
+          data: kpisData.flujoProyectado,
+          backgroundColor: ['#fbbf24', '#fb923c', '#f87171']
+        }]
+      },
+      options: chartConfig
+    });
+
+    // Gráfico 4: Automatización vs Manual
+    new Chart(document.getElementById('automatizacionChart'), {
+      type: 'bar',
+      data: {
+        labels: kpisData.months,
+        datasets: [
+          {
+            label: 'Automatizadas (%)',
+            data: kpisData.automatizadas,
+            backgroundColor: '#10b981'
+          },
+          {
+            label: 'Manuales (%)',
+            data: kpisData.manuales,
+            backgroundColor: '#f59e0b'
+          }
+        ]
+      },
+      options: {
+        ...chartConfig,
+        scales: {
+          y: { stacked: true }
+        }
+      }
+    });
+
+    // Gráfico 5: Tiempo Ahorrado Acumulado
+    new Chart(document.getElementById('tiempoAhorradoChart'), {
+      type: 'line',
+      data: {
+        labels: kpisData.months,
+        datasets: [{
+          label: 'Horas Ahorradas por Cliente',
+          data: kpisData.tiempoAhorrado,
+          borderColor: '#0284c7',
+          backgroundColor: 'rgba(2, 132, 199, 0.1)',
+          borderWidth: 3,
+          fill: true,
+          tension: 0.4,
+          pointRadius: 5,
+          pointBackgroundColor: '#0284c7'
+        }]
+      },
+      options: {
+        ...chartConfig,
+        scales: {
+          y: { beginAtZero: true }
+        }
+      }
+    });
+
+    // Actualizar hora
+    document.getElementById('updateTime').textContent = new Date().toLocaleString('es-CL');
+
+    // Refresh button
+    document.getElementById('btnRefresh').addEventListener('click', () => {
+      location.reload();
+    });
+
+    // Export button
+    document.getElementById('btnExport').addEventListener('click', () => {
+      alert('📥 Funcionalidad de exportación en desarrollo.\n\nPróximamente podrás descargar reportes en PDF y Excel.');
+    });
+  </script>
+</body>
+</html>

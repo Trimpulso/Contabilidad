@@ -450,6 +450,76 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: 'Error interno del servidor' });
 });
 
+// ====== KPI ENDPOINTS ======
+
+// GET /api/kpis/providers - Métricas de Proveedores
+app.get('/api/kpis/providers', (req, res) => {
+  try {
+    const deudaTotal = contabilidad.reduce((sum, r) => r.estado === 'Pendiente' ? sum + r.monto : sum, 0);
+    const proveedores = [...new Set(contabilidad.map(r => r.proveedor))];
+    const gastoPromedio = contabilidad.length > 0 ? contabilidad.reduce((sum, r) => sum + r.monto, 0) / contabilidad.length : 0;
+    
+    const detalleProveedores = proveedores.map(proveedor => {
+      const records = contabilidad.filter(r => r.proveedor === proveedor);
+      const deuda = records.filter(r => r.estado === 'Pendiente').reduce((sum, r) => sum + r.monto, 0);
+      const facturasPendientes = records.filter(r => r.estado === 'Pendiente').length;
+      
+      return {
+        proveedor,
+        deuda,
+        facturasPendientes,
+        totalGasto: records.reduce((sum, r) => sum + r.monto, 0),
+        estado: deuda > 0 ? 'En Riesgo' : 'Al Día'
+      };
+    });
+    
+    res.json({
+      deudaTotal,
+      proveedoresActivos: proveedores.length,
+      gastoPromedio,
+      plazo: 28,
+      detalleProveedores,
+      tendencia: {
+        meses: ['Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov'],
+        deuda: [42.3, 43.1, 44.5, 46.2, 47.8, deudaTotal / 1000000]
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// GET /api/kpis/processes - Métricas de Procesos
+app.get('/api/kpis/processes', (req, res) => {
+  try {
+    const total = contabilidad.length;
+    const automatizadas = contabilidad.filter(r => r.tipo === 'Factura').length;
+    const manuales = total - automatizadas;
+    const tasaAutomatizacion = total > 0 ? (automatizadas / total * 100).toFixed(1) : 0;
+    const tasaErrores = 0.2; // Simulado
+    const tiempoAhorrado = total * 0.45; // 27 minutos por factura
+    
+    res.json({
+      tasaAutomatizacion,
+      tasaErrores,
+      volumenAutomatizado: automatizadas,
+      volumenManual: manuales,
+      tiempoAhorradoHoras: tiempoAhorrado,
+      tiempoPromedio: 2.1,
+      volumenpDiario: Math.round(total / 21), // días de trabajo
+      precisionClasificacion: 99.8,
+      cumplimientoPlazo: 98,
+      tendencia: {
+        meses: ['Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov'],
+        automatizadas: [78, 82, 85, 88, 90, tasaAutomatizacion],
+        tiempoAhorrado: [2.1, 2.3, 2.8, 3.2, 3.8, 4.5]
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // 404
 app.use((req, res) => {
   res.status(404).json({ error: 'Endpoint no encontrado' });
