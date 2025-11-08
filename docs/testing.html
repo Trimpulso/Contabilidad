@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Testing Chatbot Intents</title>
+    <script>
+        function test(q) { alert('Intent: ' + detectIntent(q) + '\n\nPregunta: ' + q); }
+        function detectIntent(t) {
+            t = t.toLowerCase();
+            if (t.includes('crítico') || t.includes('critico') || t.includes('riesgo')) return 'riesgo_critico';
+            if (t.includes('deuda') || t.includes('total') || t.includes('monto')) return 'deuda_total';
+            if (t.includes('excepción') || t.includes('excepcion')) return 'excepciones';
+            if (t.includes('aprobad') || t.includes('revisad')) return 'aprobados';
+            if (t.includes('proveedor') || t.includes('rut')) return 'proveedor_info';
+            return 'help';
+        }
+    </script>
+</head>
+<body>
+    <h1>🤖 Testing CAI - 5 Intents</h1>
+    <button onclick="test('¿Cuántas facturas en riesgo crítico?')">Test 1: Riesgo Crítico</button>
+    <button onclick="test('¿Deuda total?')">Test 2: Deuda Total</button>
+    <button onclick="test('¿Excepciones?')">Test 3: Excepciones</button>
+    <button onclick="test('¿Aprobadas?')">Test 4: Aprobadas</button>
+    <button onclick="test('Proveedor A')">Test 5: Proveedor Info</button>
+    <button onclick="test('Hola')">Test 6: Help</button>
+</body>
+</html>
