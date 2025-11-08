@@ -174,9 +174,6 @@
         <a href="kpis.html" style="color: white; text-decoration: none; font-size: 14px;">📈 KPIs</a>
       </div>
       <div class="meta">
-        <span id="userInfo"></span>
-        <button id="btnLogout" class="small hidden">Cerrar Sesión</button>
-        <button id="btnConfigServer" class="small" title="Configurar URL del servidor">⚙️ Servidor</button>
         <a href="index.html" style="color: white; text-decoration: none;">← Volver al Dashboard</a>
       </div>
     </div>
@@ -245,104 +242,13 @@
 
     // Inicialización
     document.addEventListener('DOMContentLoaded', () => {
-      // Generar token temporal para acceso sin autenticación
-      appState.token = 'guest-token-' + Date.now();
-      
-      updateUserUI();
       setupEventListeners();
       loadAlerts();
     });
 
     function setupEventListeners() {
-      document.getElementById('loginForm').addEventListener('submit', handleLogin);
-      document.getElementById('btnLogout').addEventListener('click', handleLogout);
       document.getElementById('btnRefresh').addEventListener('click', loadAlerts);
       document.getElementById('btnExportPDF').addEventListener('click', exportPDF);
-      document.getElementById('btnConfigServer').addEventListener('click', configureServer);
-    }
-
-    function configureServer() {
-      const currentUrl = localStorage.getItem('apiBaseUrl') || appState.apiBaseUrl;
-      const newUrl = prompt(
-        'Ingresa la URL del servidor backend:\n\n' +
-        'Actual: ' + currentUrl + '\n\n' +
-        'Ej: http://localhost:3000/api',
-        currentUrl
-      );
-      
-      if (newUrl && newUrl.trim()) {
-        localStorage.setItem('apiBaseUrl', newUrl.trim());
-        appState.apiBaseUrl = newUrl.trim();
-        alert('✅ URL configurada: ' + newUrl.trim() + '\n\nRecarga la página para aplicar cambios.');
-        location.reload();
-      }
-    }    function showLoginModal() {
-      // Modal de login deshabilitado - acceso sin credenciales
-      console.log('ℹ️ Dashboard accesible sin autenticación');
-    }
-
-    async function handleLogin(e) {
-      e.preventDefault();
-      const email = document.getElementById('loginEmail').value;
-      const password = document.getElementById('loginPassword').value;
-
-      try {
-        const response = await fetch(`${appState.apiBaseUrl}/auth/login`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, password })
-        });
-
-        if (!response.ok) throw new Error('Login fallido');
-
-        const result = await response.json();
-        appState.token = result.token;
-        appState.user = result.user;
-        localStorage.setItem('token', result.token);
-        
-        document.getElementById('loginModal').classList.add('hidden');
-        updateUserUI();
-        loadAlerts();
-      } catch (error) {
-        alert('Error en login: ' + error.message);
-      }
-    }
-
-    function handleLogout() {
-      localStorage.removeItem('token');
-      appState.token = null;
-      appState.user = null;
-      location.reload();
-    }
-
-    async function fetchUserProfile() {
-      try {
-        const response = await fetch(`${appState.apiBaseUrl}/auth/me`, {
-          headers: { 'Authorization': `Bearer ${appState.token}` }
-        });
-
-        if (response.ok) {
-          appState.user = await response.json();
-          document.getElementById('loginModal').classList.add('hidden');
-          updateUserUI();
-          loadAlerts();
-        } else {
-          throw new Error('Token inválido');
-        }
-      } catch (error) {
-        localStorage.removeItem('token');
-        appState.token = null;
-        showLoginModal();
-      }
-    }
-
-    function updateUserUI() {
-      const userInfo = document.getElementById('userInfo');
-      const btnLogout = document.getElementById('btnLogout');
-      
-      // Mostrar acceso de invitado
-      userInfo.textContent = '👤 Acceso de Invitado';
-      btnLogout.classList.add('hidden');
     }
 
     async function loadAlerts() {

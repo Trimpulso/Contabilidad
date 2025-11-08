@@ -10,20 +10,6 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
 <body>
-  <!-- Login Modal -->
-  <div id="loginModal" class="modal hidden">
-    <div class="modal-content">
-      <h2>🔐 Iniciar Sesión</h2>
-      <form id="loginForm">
-        <input id="loginEmail" type="email" placeholder="Email" required />
-        <input id="loginPassword" type="password" placeholder="Contraseña" required />
-        <button type="submit">Entrar</button>
-        <p class="hint">Demo: admin@trimpulso.cl / demo123</p>
-      </form>
-      <button id="btnSkipLogin" class="secondary">Continuar sin login (solo JSON)</button>
-    </div>
-  </div>
-
   <header>
     <div class="header-content">
       <h1>📊 Dashboard Contabilidad</h1>
@@ -35,9 +21,7 @@
       <div class="meta">
         <span id="fuente">Fuente: —</span>
         <span id="generado">Actualizado: —</span>
-        <span id="userInfo" class="hidden"></span>
         <a href="alertas.html" style="color: white; text-decoration: underline;">🚨 Ver Alertas</a>
-        <button id="btnLogout" class="hidden small">Cerrar Sesión</button>
       </div>
     </div>
   </header>

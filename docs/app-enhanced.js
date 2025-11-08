@@ -4,41 +4,17 @@ const appState = {
   currentSheet: null,
   currentRows: [],
   filteredRows: [],
-  chartInstance: null,
-  token: localStorage.getItem('token'),
-  user: null,
-  apiBaseUrl: window.location.hostname === 'localhost' 
-    ? 'http://localhost:3000/api' 
-    : 'https://trimpulso.github.io/Contabilidad/api'
+  chartInstance: null
 };
 
 // Inicialización
 document.addEventListener('DOMContentLoaded', () => {
-  checkAuth();
   setupEventListeners();
+  loadDataFromJSON();
 });
-
-// Verificar autenticación
-function checkAuth() {
-  if (appState.token) {
-    fetchUserProfile();
-  } else {
-    showLoginModal();
-  }
-}
-
-// Mostrar modal de login
-function showLoginModal() {
-  document.getElementById('loginModal').classList.remove('hidden');
-}
 
 // Configurar event listeners
 function setupEventListeners() {
-  // Login
-  document.getElementById('loginForm').addEventListener('submit', handleLogin);
-  document.getElementById('btnSkipLogin').addEventListener('click', loadDataFromJSON);
-  document.getElementById('btnLogout').addEventListener('click', handleLogout);
-
   // Controles
   document.getElementById('sheetSelect').addEventListener('change', onSheetChange);
   document.getElementById('categorySelect').addEventListener('change', renderVisualization);
@@ -60,115 +36,8 @@ function setupEventListeners() {
   document.getElementById('pivotVals').addEventListener('change', renderPivotTable);
 }
 
-// Handle login
-async function handleLogin(e) {
-  e.preventDefault();
-  const email = document.getElementById('loginEmail').value;
-  const password = document.getElementById('loginPassword').value;
-
-  try {
-    const response = await fetch(`${appState.apiBaseUrl}/auth/login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password })
-    });
-
-    if (!response.ok) {
-      throw new Error('Login fallido');
-    }
-
-    const result = await response.json();
-    appState.token = result.token;
-    appState.user = result.user;
-    localStorage.setItem('token', result.token);
-    
-    document.getElementById('loginModal').classList.add('hidden');
-    updateUserUI();
-    loadDataFromAPI();
-  } catch (error) {
-    alert('Error en login. Continuando sin autenticación.');
-    console.error(error);
-    loadDataFromJSON();
-  }
-}
-
-// Handle logout
-function handleLogout() {
-  localStorage.removeItem('token');
-  appState.token = null;
-  appState.user = null;
-  document.getElementById('userInfo').classList.add('hidden');
-  document.getElementById('btnLogout').classList.add('hidden');
-  showLoginModal();
-}
-
-// Fetch user profile
-async function fetchUserProfile() {
-  try {
-    const response = await fetch(`${appState.apiBaseUrl}/auth/me`, {
-      headers: { 'Authorization': `Bearer ${appState.token}` }
-    });
-
-    if (response.ok) {
-      appState.user = await response.json();
-      document.getElementById('loginModal').classList.add('hidden');
-      updateUserUI();
-      loadDataFromAPI();
-    } else {
-      throw new Error('Token inválido');
-    }
-  } catch (error) {
-    console.error('Error al verificar token:', error);
-    localStorage.removeItem('token');
-    appState.token = null;
-    showLoginModal();
-  }
-}
-
-// Actualizar UI con info del usuario
-function updateUserUI() {
-  const userInfo = document.getElementById('userInfo');
-  const btnLogout = document.getElementById('btnLogout');
-  
-  if (appState.user) {
-    userInfo.textContent = `👤 ${appState.user.name}`;
-    userInfo.classList.remove('hidden');
-    btnLogout.classList.remove('hidden');
-    document.getElementById('dataSource').textContent = 'API Backend';
-  }
-}
-
-// Cargar datos desde API
-async function loadDataFromAPI() {
-  try {
-    const response = await fetch(`${appState.apiBaseUrl}/records`, {
-      headers: { 'Authorization': `Bearer ${appState.token}` }
-    });
-
-    if (!response.ok) throw new Error('Error al cargar datos de API');
-
-    const result = await response.json();
-    
-    // Convertir al formato esperado
-    appState.data = {
-      fuente: 'API Backend',
-      generado: new Date().toISOString(),
-      hojas: {
-        'API Data': result.records
-      }
-    };
-
-    initializeDashboard();
-  } catch (error) {
-    console.error('Error cargando desde API:', error);
-    alert('Error al cargar datos del servidor. Usando datos locales.');
-    loadDataFromJSON();
-  }
-}
-
 // Cargar datos desde JSON local
 async function loadDataFromJSON() {
-  document.getElementById('loginModal').classList.add('hidden');
   
   try {
     const response = await fetch('data/contabilidad.json');
