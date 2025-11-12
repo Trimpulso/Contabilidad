@@ -27,7 +27,7 @@ class ChatbotCAI {
     
     // Inicializar módulo de IA (carga bajo demanda)
     this.chatbotIA = null;
-    this.modoIA = false; // false = solo intents, true = híbrido
+    this.modoIA = true; // ✅ IA ACTIVADA POR DEFECTO
     
     this.init();
   }
@@ -243,13 +243,13 @@ class ChatbotCAI {
     // COMANDOS DE SISTEMA IA
     if (lower === 'activar ia' || lower === 'ia on' || lower === 'enable ia') {
       this.modoIA = true;
-      this.addMessage('✅ **Modo IA Activado**\n\nAhora puedo responder preguntas naturales sobre tus datos.', 'bot');
+      this.addMessage('✅ **IA ya estaba activa**\n\nSigue haciendo preguntas. 😊', 'bot');
       return 'system_command';
     }
     
     if (lower === 'desactivar ia' || lower === 'ia off' || lower === 'disable ia') {
       this.modoIA = false;
-      this.addMessage('✅ **Modo IA Desactivado**\n\nVolviendo a comandos rápidos (1-6).', 'bot');
+      this.addMessage('⚠️ **IA desactivada**\n\nAhora solo usarás comandos 1-6.\n\nEscribe "activar ia" para volver.', 'bot');
       return 'system_command';
     }
 
@@ -496,24 +496,21 @@ class ChatbotCAI {
    * Mensaje de ayuda mejorado (CON PREGUNTAS NUMERADAS)
    */
   getHelpMessage() {
-    const modoActual = this.modoIA ? '✅ IA Activa' : '❌ Solo Comandos';
-    
     return (
-      `¡Hola! Soy **CAI v3.0**, tu asistente contable.\n\n` +
-      `**🎯 MODO ACTUAL:** ${modoActual}\n\n` +
-      `**📋 COMANDOS RÁPIDOS (Respuesta instantánea):**\n` +
-      `1️⃣ - Riesgo crítico\n` +
-      `2️⃣ - Deuda total\n` +
-      `3️⃣ - Excepciones\n` +
-      `4️⃣ - Aprobados\n` +
-      `5️⃣ - Listar proveedores\n` +
-      `6️⃣ - Info de proveedor\n\n` +
-      `**🧠 ACTIVAR IA (Preguntas naturales):**\n` +
-      `Escribe: **"activar ia"**\n\n` +
-      `Luego podrás preguntar:\n` +
-      `• "¿Qué proveedores tienen riesgo?"` +
-      `\n• "Dame resumen de Empresa Fantasma"\n` +
-      `• "¿Cuál es el total de facturas críticas?"`
+      `¡Hola! Soy **CAI v3.0**, tu asistente inteligente.\n\n` +
+      `**🤖 IA ACTIVA** - Haz preguntas en lenguaje natural\n\n` +
+      `**Ejemplos de preguntas:**\n` +
+      `• "¿Qué proveedores tienen mayor riesgo?"\n` +
+      `• "Dame resumen de Empresa Fantasma"\n` +
+      `• "¿Hay algún patrón de riesgo?"\n` +
+      `• "¿Cuál es el total de facturas críticas?"\n\n` +
+      `**O usa comandos rápidos (1-6):**\n` +
+      `1️⃣ Riesgos críticos\n` +
+      `2️⃣ Deuda total\n` +
+      `3️⃣ Excepciones\n` +
+      `4️⃣ Aprobados\n` +
+      `5️⃣ Listar proveedores\n` +
+      `6️⃣ Info de proveedor`
     );
   }
 
@@ -522,7 +519,7 @@ class ChatbotCAI {
    */
   showWelcomeMessage() {
     setTimeout(() => {
-      const welcome = `¡Hola! Soy **CAI**, tu asistente contable.\n\n**Prueba:**\n• Escribe **1** para riesgos\n• Escribe **5** para ver proveedores\n• Escribe **"activar ia"** para preguntas`;
+      const welcome = `¡Hola! Soy **CAI**, tu asistente inteligente.\n\n**🤖 IA Activada** - Puedo responder cualquier pregunta sobre tus proveedores.\n\n**Prueba:**\n• "¿Qué proveedores tienen riesgo?"\n• "Dame resumen de Empresa Fantasma"\n• O usa: 1, 2, 3, 4, 5, 6`;
       this.addMessage(welcome, 'bot');
     }, 300);
   }
